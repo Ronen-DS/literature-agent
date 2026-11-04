@@ -8,7 +8,6 @@
       "Bash(python:*)",
       "Bash(pip install:*)",
       "Bash(ls:*)",
-      "Bash(cat:*)",
       "Bash(git status)",
       "Bash(git diff:*)",
       "Bash(git add:*)",
@@ -19,6 +18,7 @@
       "Bash(sudo:*)",
       "Bash(git push:*)",
       "Bash(curl:*)",
+      "Bash(cat:*)",
       "Read(./.env)"
     ]
   }
