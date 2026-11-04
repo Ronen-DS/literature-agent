@@ -5,6 +5,13 @@
 - Later phase: adapt finished reviews into grant proposal background/significance sections.
 - Field: biomedical / life sciences.
 
+## Research scope
+- Core topics: HLA peptidomics / immunopeptidomics (mass spectrometry of HLA-bound peptides), neoantigen identification and prediction, TCR identification and TCR reactivity to neoantigens, and T-cell based cancer immunotherapy (e.g. TCR-T, TIL, neoantigen vaccines).
+- Include: original research and reviews linking these topics, both computational and experimental methods.
+- Exclude: papers on HLA only for transplantation matching or disease-association typing, unless they involve peptide presentation or T-cell recognition.
+- Suggested search terms: immunopeptidome, HLA ligandome, MHC-bound peptides, neoantigen, neoepitope, TCR repertoire, TCR-pMHC, T cell reactivity, HLA class I, HLA class II.
+- Each review's specific question will be given in the prompt; stay within this scope.
+
 ## Paper search
 - Source: PubMed / MEDLINE only, via NCBI E-utilities (esearch, efetch, esummary).
 - Respect NCBI rate limits: 3 requests/sec without an API key, 10/sec with one.
