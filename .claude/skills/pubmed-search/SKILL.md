@@ -22,7 +22,8 @@ this process may be cited (see Accuracy rules in CLAUDE.md).
    - TCRs: `"TCR repertoire"`, `"TCR-pMHC"`, `"Receptors, Antigen, T-Cell"[MeSH Terms]`
    - T-cell therapy: `"TCR-T"`, `"tumor-infiltrating lymphocytes"`, `"neoantigen vaccine*"`
 4. **Combine them:** join synonyms with `OR` inside brackets, and join concepts
-   with `AND`:
+   with `AND`. **Run two or three such queries per review question, not one.**
+   See "Recall" below — one narrow query reliably misses in-scope papers.
    ```
    (immunopeptidom*[tiab] OR "HLA ligandome"[tiab] OR "MHC-bound peptides"[tiab])
    AND (neoantigen*[tiab] OR neoepitope*[tiab] OR "Antigens, Neoplasm"[MeSH Terms])
@@ -32,6 +33,35 @@ this process may be cited (see Accuracy rules in CLAUDE.md).
    - Add `AND review[pt]` to find only reviews, or `NOT review[pt]` to skip them.
    - Avoid `NOT` for the transplantation exclusion; it can drop relevant papers.
      Screen those out by reading instead (step 3).
+
+## Recall: why one query is not enough
+
+Joining two concepts with `AND` demands that a paper use words from *both*
+groups. In-scope papers often don't. A worked example from this project:
+
+> `(immunopeptidom*[tiab] OR "HLA ligandome"[tiab]) AND neoantigen*[tiab]`
+> returned 167 papers (2021+), while the immunopeptidomics half alone returned
+> 780. Among the 613 dropped was "HLA export by melanoma cells decoys cytotoxic
+> T cells to promote immune evasion" (Cell, PMID 41401806) — melanoma
+> immunopeptidomics with TCR-seq, squarely in scope. Its abstract says
+> "mutated proteins" and "tumor-associated antigens", never "neoantigen".
+
+The match count does not reveal this: 167 looks like a healthy number. So:
+
+- **Run a narrow query and a broader one**, and screen the union. The broader
+  query keeps one concept as a strict anchor and widens the other, e.g.
+  ```
+  (immunopeptidom*[tiab] OR "HLA ligandome"[tiab] OR "MHC-bound peptides"[tiab])
+  AND (neoantigen*[tiab] OR neoepitope*[tiab] OR "T cell recognition"[tiab]
+       OR TCR[tiab] OR "antigen presentation"[tiab] OR "immune evasion"[tiab])
+  ```
+- Remember that the scope in CLAUDE.md lists immunopeptidomics, neoantigens,
+  TCRs and T-cell therapy as **separate** core topics. A query that only finds
+  their intersection under-serves it.
+- Prefer broad retrieval plus careful screening over a narrow query. Reading 50
+  extra abstracts is cheaper than missing a key paper.
+- `screen.py` takes several results files at once and removes papers found by
+  more than one, so screening the union costs nothing extra.
 
 ## 2. Run the search
 

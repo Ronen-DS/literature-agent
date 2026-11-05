@@ -1,8 +1,10 @@
 """
-screen.py - Step 1 of paper screening: filter a pubmed-search results file
-by age and citations, then add a journal metric.
+screen.py - Step 1 of paper screening: filter one or more pubmed-search
+results files by age and citations, then add a journal metric.
 
 What it does:
+  0. If given several results files, combines them and drops papers that
+     appear in more than one (matched by PMID).
   1. Keeps only papers from the last YEARS_BACK years.
   2. Gets citation counts from NIH iCite and removes papers with fewer than
      MIN_CITATIONS, unless they were published in the last RECENT_MONTHS_EXEMPT
@@ -14,6 +16,9 @@ What it does:
 
 Run from the project folder:
   python .claude/skills/paper-screening/screen.py results/2026-11-04_my-topic.json
+
+Several searches screened together as one set (use --out to name the output):
+  python .claude/skills/paper-screening/screen.py results/a.json results/b.json --out my-topic
 """
 
 import argparse
@@ -171,19 +176,45 @@ def add_journal_metrics(papers, api_key):
 # Main program
 # ---------------------------------------------------------------------------
 
+def load_papers(paths):
+    """Load one or more results files into a single list of papers.
+
+    A paper found by two different searches appears in both files, so we keep
+    only the first copy of each PMID. Returns (papers, queries, duplicates)."""
+    papers, queries, seen, duplicates = [], [], set(), 0
+    for path in paths:
+        with open(path, encoding="utf-8") as f:
+            search = json.load(f)
+        queries.append(search.get("query"))
+        new = 0
+        for paper in search["papers"]:
+            if paper["pmid"] in seen:
+                duplicates += 1  # already came from an earlier file
+                continue
+            seen.add(paper["pmid"])
+            papers.append(paper)
+            new += 1
+        print(f"Loaded {new} papers from {path}"
+              + (f" ({len(search['papers']) - new} already seen)" if new != len(search["papers"]) else ""))
+    return papers, queries, duplicates
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Filter a pubmed-search results file.")
-    parser.add_argument("results_file", help="e.g. results/2026-11-04_my-topic.json")
+    parser = argparse.ArgumentParser(description="Filter pubmed-search results files.")
+    parser.add_argument("results_files", nargs="+",
+                        help="one or more files, e.g. results/2026-11-04_my-topic.json")
+    parser.add_argument("--out", help="short label for the output file name "
+                                      "(default: taken from the first input file)")
     args = parser.parse_args()
 
     load_dotenv(PROJECT_DIR / ".env")  # reads OPENALEX_API_KEY from .env if present
     api_key = os.getenv("OPENALEX_API_KEY") or None
 
-    input_path = Path(args.results_file)
-    with open(input_path, encoding="utf-8") as f:
-        search = json.load(f)
-    papers = search["papers"]
-    print(f"Loaded {len(papers)} papers from {input_path}")
+    input_paths = [Path(p) for p in args.results_files]
+    papers, queries, duplicates = load_papers(input_paths)
+    if duplicates:
+        print(f"Combined into {len(papers)} unique papers "
+              f"({duplicates} duplicate{'s' if duplicates > 1 else ''} removed)")
 
     # --- Step 1: publication age ---
     first_year = date.today().year - YEARS_BACK
@@ -215,14 +246,17 @@ def main():
     print(f"  Journal metric found for {len(kept) - missing} of {len(kept)} papers")
 
     # --- Save ---
-    output_path = input_path.with_name(input_path.stem + "_filtered.json")
+    # Name the output after --out if given, otherwise after the first input file
+    stem = f"{date.today().isoformat()}_{args.out}" if args.out else input_paths[0].stem
+    output_path = input_paths[0].with_name(stem + "_filtered.json")
     output = {
-        "source_file": str(input_path),
-        "query": search.get("query"),
+        "source_files": [str(p) for p in input_paths],
+        "queries": queries,
         "screened_on": date.today().isoformat(),
         "settings": {"YEARS_BACK": YEARS_BACK, "MIN_CITATIONS": MIN_CITATIONS,
                      "RECENT_MONTHS_EXEMPT": RECENT_MONTHS_EXEMPT},
-        "counts": {"loaded": len(papers), "removed_by_age": removed_age,
+        "counts": {"loaded": len(papers), "duplicates_removed": duplicates,
+                   "removed_by_age": removed_age,
                    "removed_by_citations": removed_citations,
                    "kept_by_recent_exemption": exempted, "kept": len(kept)},
         "papers": kept,

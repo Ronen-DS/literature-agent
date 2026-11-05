@@ -14,7 +14,20 @@ Input: a results file made by the `pubmed-search` skill, e.g.
 python .claude/skills/paper-screening/screen.py results/<file>.json
 ```
 
+When a review question was searched with more than one query (the normal case —
+see the `pubmed-search` skill on recall), pass all the results files and give
+the combined set a name with `--out`:
+
+```
+python .claude/skills/paper-screening/screen.py results/<file-a>.json results/<file-b>.json --out my-topic
+```
+
+Papers found by more than one query are kept once, matched by PMID, and the
+script prints how many duplicates it dropped. The output is then
+`results/<today>_my-topic_filtered.json`.
+
 The script:
+0. Combines the input files and removes duplicate PMIDs.
 1. Keeps papers published in the last `YEARS_BACK` years (this calendar year
    and the 5 before it by default).
 2. Gets citation counts from NIH iCite and removes papers with fewer than
@@ -23,7 +36,7 @@ The script:
 3. Adds the journal's OpenAlex 2-year mean citedness (similar to an impact
    factor), found by DOI, or by journal name if the DOI fails.
 4. Prints how many papers were removed at each step and saves the kept papers
-   to `results/<file>_filtered.json`.
+   to `results/<file>_filtered.json` (or `<today>_<out>_filtered.json`).
 
 The thresholds are settings at the top of `screen.py`. Check the "Matched by
 name" lines it prints: a name match can pick the wrong journal.
@@ -79,8 +92,9 @@ decision, reason, subtopic, study_type, pubmed_link.
 ## Report to the user
 
 Tell the user:
-- the counts at each step (loaded, removed by age, removed by citations, kept
-  because recent, final count), and the include / maybe / exclude totals;
+- the counts at each step (loaded, duplicates removed, removed by age, removed
+  by citations, kept because recent, final count), and the
+  include / maybe / exclude totals;
 - the top included papers (title, first author, journal, year, citations,
   metric);
 - any "Matched by name" journal lookups or papers with no metric;
