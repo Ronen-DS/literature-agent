@@ -6,11 +6,13 @@ How it works:
   2. "efetch" downloads the full records (title, authors, abstract...) for those PMIDs.
   3. We pull out the fields we need and save them to results/<date>_<topic>.json
 
-Examples:
-  python search.py "immunopeptidome AND neoantigen"
-  python search.py "TCR-T AND neoantigen" --max 50
-  python search.py "HLA ligandome" --mindate 2020 --maxdate 2025
-  python search.py "HLA ligandome" --topic hla-ligandome
+Run from the project folder. Examples:
+  python .claude/skills/pubmed-search/search.py "immunopeptidome AND neoantigen"
+  python .claude/skills/pubmed-search/search.py "TCR-T AND neoantigen" --max 50
+  python .claude/skills/pubmed-search/search.py "HLA ligandome" --mindate 2020 --maxdate 2025
+  python .claude/skills/pubmed-search/search.py "HLA ligandome" --topic hla-ligandome
+
+Results always go to <project>/results/, whatever folder you run it from.
 """
 
 import argparse
@@ -34,8 +36,13 @@ TOOL_NAME = "lit-review-agent"
 # How many records to download per efetch request (keeps each request small)
 FETCH_BATCH_SIZE = 200
 
-# Folder where result files are saved (next to this script)
-RESULTS_DIR = Path(__file__).parent / "results"
+# This script lives in <project>/.claude/skills/pubmed-search/, so the project
+# folder is three levels up. parents[0] is pubmed-search, [1] is skills,
+# [2] is .claude, and [3] is the project folder itself.
+PROJECT_DIR = Path(__file__).resolve().parents[3]
+
+# Folder where result files are saved
+RESULTS_DIR = PROJECT_DIR / "results"
 
 
 # ---------------------------------------------------------------------------
@@ -45,7 +52,9 @@ RESULTS_DIR = Path(__file__).parent / "results"
 def get_api_key():
     """Read NCBI_API_KEY from .env (if the file exists) or the environment.
     Returns None when there is no key - the script still works, just slower."""
-    load_dotenv()  # does nothing if there is no .env file
+    # Read the project's .env file. Naming it explicitly means the script works
+    # no matter which folder you run it from.
+    load_dotenv(PROJECT_DIR / ".env")  # does nothing if there is no .env file
     return os.getenv("NCBI_API_KEY") or None
 
 

@@ -35,6 +35,10 @@ MIN_CITATIONS = 50         # minimum iCite citation count to keep a paper...
 RECENT_MONTHS_EXEMPT = 12  # ...unless it was published within this many months
 # ---------------------------------------------------------------------------
 
+# This script lives in <project>/.claude/skills/paper-screening/, so the
+# project folder is three levels up (see search.py for the same pattern).
+PROJECT_DIR = Path(__file__).resolve().parents[3]
+
 ICITE_URL = "https://icite.od.nih.gov/api/pubs"
 OPENALEX_URL = "https://api.openalex.org/"
 BATCH_SIZE = 50  # papers per API request
@@ -172,7 +176,7 @@ def main():
     parser.add_argument("results_file", help="e.g. results/2026-11-04_my-topic.json")
     args = parser.parse_args()
 
-    load_dotenv()  # reads OPENALEX_API_KEY from .env if present
+    load_dotenv(PROJECT_DIR / ".env")  # reads OPENALEX_API_KEY from .env if present
     api_key = os.getenv("OPENALEX_API_KEY") or None
 
     input_path = Path(args.results_file)

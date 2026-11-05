@@ -38,7 +38,7 @@ this process may be cited (see Accuracy rules in CLAUDE.md).
 Run from the project folder:
 
 ```
-python search.py "<query>" --max 20 --topic <short-label>
+python .claude/skills/pubmed-search/search.py "<query>" --max 20 --topic <short-label>
 ```
 
 Options:
@@ -48,7 +48,7 @@ Options:
 
 Example:
 ```
-python search.py "(immunopeptidom*[tiab] OR \"HLA ligandome\"[tiab]) AND neoantigen*[tiab]" --max 30 --mindate 2018 --topic immunopeptidomics-neoantigens
+python .claude/skills/pubmed-search/search.py "(immunopeptidom*[tiab] OR \"HLA ligandome\"[tiab]) AND neoantigen*[tiab]" --max 30 --mindate 2018 --topic immunopeptidomics-neoantigens
 ```
 
 **Check the match count first.** The script prints how many papers match in
