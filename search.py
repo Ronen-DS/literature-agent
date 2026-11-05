@@ -155,6 +155,33 @@ def parse_year(article):
     return article.findtext(".//ArticleDate/Year", default="")
 
 
+# PubMed writes months as "Jan", "Feb"... (sometimes as numbers)
+MONTHS = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+          "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
+
+
+def parse_pub_date(article):
+    """Return the publication date as 'YYYY-MM-DD' (missing month/day become 01).
+    Prefers the electronic date (ArticleDate), which is usually when the paper
+    first appeared online; otherwise uses the journal issue date."""
+    for path in (".//ArticleDate", ".//Journal/JournalIssue/PubDate"):
+        date_element = article.find(path)
+        if date_element is None or not date_element.findtext("Year"):
+            continue
+        year = int(date_element.findtext("Year"))
+        month_text = date_element.findtext("Month", default="1")
+        if month_text.isdigit():
+            month = int(month_text)
+        else:
+            month = MONTHS.get(month_text[:3].lower(), 1)
+        day_text = date_element.findtext("Day", default="1")
+        day = int(day_text) if day_text.isdigit() else 1
+        return f"{year:04d}-{month:02d}-{day:02d}"
+    # Last resort: only the year is known
+    year = parse_year(article)
+    return f"{year}-01-01" if year else ""
+
+
 def parse_abstract(article):
     """Join all abstract sections. Structured abstracts get their labels
     (e.g. "METHODS: ...") so the sections stay readable."""
@@ -185,6 +212,7 @@ def parse_article(article):
         "authors": parse_authors(article),
         "journal": article.findtext(".//Journal/Title", default=""),
         "year": parse_year(article),
+        "pub_date": parse_pub_date(article),
         "abstract": parse_abstract(article),
         "doi": parse_doi(article),
     }

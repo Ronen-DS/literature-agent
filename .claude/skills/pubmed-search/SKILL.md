@@ -61,7 +61,10 @@ synonyms, drop a concept). Rerunning is fine; files from the same day get `_2`,
 
 Results are written to `results/<date>_<short-topic>.json`, containing the query,
 date range, total matches, and a `papers` list where each paper has:
-`pmid`, `title`, `authors`, `journal`, `year`, `abstract`, `doi`.
+`pmid`, `title`, `authors`, `journal`, `year`, `pub_date` (YYYY-MM-DD), `abstract`, `doi`.
+
+To filter by citations and journal metrics and screen for relevance, use the
+`paper-screening` skill next.
 
 After each search:
 1. Read the titles and abstracts and **screen against the scope** in CLAUDE.md.
