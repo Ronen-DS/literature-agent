@@ -36,6 +36,13 @@
 - Explain how to run anything new, with exact commands.
 - Explain errors in plain language before fixing them.
 
+## Shell habits
+- Never prefix commands with `cd`; commands already run from the project root.
+- Run one command at a time; do not chain with `&&` or `;`.
+- To view or inspect a file, use the Read tool, never `cat`, `head` or `tail`.
+- Do not use `python -c`. For a quick inspection, write a short script to
+  `scratch/` and run it with `python scratch/<name>.py`.
+
 ## Workflow
 - Install packages with `pip install`; track them in `requirements.txt`.
 - Commit with clear messages; do not push (git push is blocked in settings).
