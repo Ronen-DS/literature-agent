@@ -29,19 +29,10 @@
 - Every claim drawn from the literature must have a citation.
 - If evidence is thin or conflicting, say so rather than overstating it.
 
-## Code style (user is a Python beginner)
-- Keep code simple and readable: plain functions, clear names, short files.
-- Add brief comments explaining what each part does and why.
+## Code style
 - Prefer few, well-known libraries (e.g. `requests`, `python-dotenv`).
 - Explain how to run anything new, with exact commands.
 - Explain errors in plain language before fixing them.
-
-## Shell habits
-- Never prefix commands with `cd`; commands already run from the project root.
-- Run one command at a time; do not chain with `&&` or `;`.
-- To view or inspect a file, use the Read tool, never `cat`, `head` or `tail`.
-- Do not use `python -c`. For a quick inspection, write a short script to
-  `scratch/` and run it with `python scratch/<name>.py`.
 
 ## Workflow
 - Install packages with `pip install`; track them in `requirements.txt`.
