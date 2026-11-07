@@ -1,10 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Edit",
-      "Write",
       "WebSearch",
-      "WebFetch"
+      "WebFetch",
+      "Bash(python .claude/skills/pubmed-search/search.py:*)",
+      "Bash(python .claude/skills/paper-screening/screen.py:*)",
+      "Bash(python .claude/skills/paper-screening/make_csv.py:*)"
     ]
   }
 }
