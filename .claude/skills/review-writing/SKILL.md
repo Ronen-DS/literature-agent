@@ -1,6 +1,6 @@
 ---
 name: review-writing
-description: Write a narrative literature review from a screened CSV made by the paper-screening skill. Selects the papers relevant to a specific review question, organises them by theme, writes 3,000-5,000 words with Vancouver citations, checks every citation against the CSV, and saves a Word document to results/. Use after paper-screening, when the user asks for a review to be written.
+description: Write a narrative literature review from a screened CSV made by the paper-screening skill. Selects the papers relevant to a specific review question, organises them by theme, writes 3,000-5,000 words with Vancouver citations, checks every citation against the CSV, and saves a Word document plus a checked _references.json to results/. Use after paper-screening, when the user asks for a review to be written.
 ---
 
 # Review writing
@@ -142,6 +142,47 @@ Notes for this machine, found on the first run:
   the heading count, the reference count, and that no `[[pmid]]` markers or `##`
   characters survived.
 
+## Step 7: Save the reference list as JSON (always)
+
+Every review gets a reference list saved next to its .docx, with the same name
+ending in `_references.json`, e.g.
+`results/2026-11-06_my-topic_review.docx` →
+`results/2026-11-06_my-topic_references.json`. It records which screened CSV
+the references came from, so the citations can be re-checked at any time.
+
+Build it from the `## References` section of the final numbered draft, in the
+same order, one entry per reference. Take each DOI from the `_filtered.json`
+next to the CSV; never type a DOI from memory (leave `"doi": ""` if it has none).
+
+```json
+{
+  "review": "results/2026-11-06_my-topic_review.docx",
+  "screened_csv": "results/2026-11-06_my-topic_screened.csv",
+  "references": [
+    {"number": 1, "pmid": "37328642", "doi": "10.1038/s41571-023-00789-4",
+     "citation": "Yang K, et al. Antigen presentation in cancer ... 2023. PMID: 37328642"}
+  ]
+}
+```
+
+**Write this file with the Write tool**, not from a Python script. A hook in
+`.claude/settings.json` runs `check_citations.py` after every Write to a
+`*_references.json` file. If any reference has no PMID, a PMID is not in the
+CSV, or a paper's decision is not `include`, the hook blocks and sends the
+failure report back. Fix the reference list (and the review, if a citation in
+it is wrong) and write the file again until it passes. Never edit the CSV or
+the script to make it pass.
+
+To run the same check by hand:
+
+```
+python .claude/skills/review-writing/check_citations.py results/<name>_references.json
+```
+
+Note that this check accepts only `include` papers. If the review cites a
+`maybe` paper, the check will fail on it. Tell the user, and don't hand over
+the review until they have decided how to handle it.
+
 ## Report to the user
 
 - the review question as you understood it;
@@ -149,5 +190,6 @@ Notes for this machine, found on the first run:
   papers were used;
 - the themes you organised it under;
 - the word count and that the citation check passed;
-- the path to the .docx (and the markdown draft);
+- the path to the .docx, the `_references.json` (and that its check passed),
+  and the markdown draft;
 - anything the literature in the CSV could not answer.

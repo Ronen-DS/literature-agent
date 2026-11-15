@@ -5,7 +5,23 @@
       "WebFetch",
       "Bash(python .claude/skills/pubmed-search/search.py:*)",
       "Bash(python .claude/skills/paper-screening/screen.py:*)",
-      "Bash(python .claude/skills/paper-screening/make_csv.py:*)"
+      "Bash(python .claude/skills/paper-screening/make_csv.py:*)",
+      "Bash(python .claude/skills/review-writing/check_citations.py:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/skills/review-writing/check_citations.py\" --hook",
+            "timeout": 30,
+            "statusMessage": "Checking citations..."
+          }
+        ]
+      }
     ]
   }
 }
