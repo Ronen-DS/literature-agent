@@ -126,21 +126,27 @@ that fails this check, and never change the script to make a draft pass.
 
 ## Step 6: Make the Word document
 
-Use the `docx` skill to convert the finished markdown into a Word document at
-`results/<date>_<topic>_review.docx`. Keep the heading structure, and keep the
-reference numbers as literal text (not an auto-numbered list) so they always
-match the in-text citations.
+```
+python .claude/skills/review-writing/make_docx.py <scratchpad>/draft.md results/<date>_<topic>_review.docx
+```
 
-Notes for this machine, found on the first run:
-- `pandoc` is not installed, so the markdown cannot be converted directly.
-- The `docx` npm package is not preinstalled either. Run `npm install docx` in
-  the scratchpad directory and write the conversion script there, so no Node
-  packages land in the project.
-- The docx skill's visual check does not work here: `pdftoppm` is missing and
-  its LibreOffice helper needs Unix sockets. Verify the file instead by reading
-  `word/document.xml` out of the .docx with Python's `zipfile` and confirming
-  the heading count, the reference count, and that no `[[pmid]]` markers or `##`
-  characters survived.
+This converts the numbered draft, keeping the heading structure and keeping the
+reference numbers as literal text (not a Word auto-numbered list) so they can
+never drift out of step with the in-text citations. It prints the heading and
+reference counts; check them against the draft.
+
+It needs `python-docx`, which is in `requirements.txt`
+(`pip install python-docx` if it is missing).
+
+Notes for this machine, found on earlier runs:
+- `pandoc` is not installed, so the markdown cannot be converted directly, and
+  the `docx` skill's visual check does not work here either (`pdftoppm` is
+  missing and its LibreOffice helper needs Unix sockets). That is why this
+  script exists; don't reach for the `docx` skill or npm packages.
+- Verify the result by reading `word/document.xml` out of the .docx with
+  Python's `zipfile`: confirm the heading count, the reference count, that no
+  `[[pmid]]` markers or `##` characters survived, and that the in-text citation
+  numbers and the reference numbers are the same set.
 
 ## Step 7: Save the reference list as JSON (always)
 
