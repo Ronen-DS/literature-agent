@@ -83,8 +83,8 @@ resumed, or audited after the fact.
 Requires [Claude Code](https://claude.com/claude-code) and Python 3.
 
 ```bash
-git clone <this repo>
-cd lit-review-agent
+git clone https://github.com/Ronen-DS/literature-agent.git
+cd literature-agent
 pip install -r requirements.txt
 ```
 
