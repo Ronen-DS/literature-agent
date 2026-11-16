@@ -1,0 +1,156 @@
+# Worked example: therapeutic modulation of antigen presentation
+
+A complete run of the pipeline, with the real numbers it produced. Nothing here
+is reconstructed — every figure comes from the files the run wrote.
+
+**Review question**
+
+> Therapeutic modulation of antigen presentation to enhance neoantigen display —
+> can neoantigen presentation be therapeutically increased, and does it improve
+> T-cell recognition?
+
+**Run date:** 6 November 2026 · **Searches limited to:** 2023 onwards
+
+Contents:
+
+- [The search](#1-the-search) — three complementary queries
+- [The funnel](#2-the-funnel) — 1,048 hits down to 208 usable papers
+- [The review](review-excerpt.md) — question, themes and opening ~300 words
+- [The references](references.md) — all 51, with the citation-check result
+
+---
+
+## 1. The search
+
+Three queries were run rather than one. The reason is recall: joining two
+concepts with `AND` demands that a paper use vocabulary from both groups, and
+in-scope papers often do not. The narrow query is the precise statement of the
+question; the broader ones keep one concept as a strict anchor and widen the
+other.
+
+### Query 1 — narrow
+
+Immunopeptidomics **and** neoantigens, both stated explicitly.
+
+```
+(immunopeptidom*[tiab] OR "HLA ligandome"[tiab] OR "MHC-bound peptides"[tiab]
+ OR "HLA peptidom*"[tiab])
+AND
+(neoantigen*[tiab] OR neoepitope*[tiab] OR "Antigens, Neoplasm"[MeSH Terms])
+```
+
+**199 matches in PubMed · 199 saved**
+
+### Query 2 — broader, anchored on immunopeptidomics
+
+Same immunopeptidomics anchor, but the second concept widened from "neoantigen"
+to the surrounding vocabulary, so papers that describe tumour antigen
+presentation without ever using the word "neoantigen" are still retrieved.
+
+```
+(immunopeptidom*[tiab] OR "HLA ligandome"[tiab] OR "MHC-bound peptides"[tiab]
+ OR "HLA peptidom*"[tiab])
+AND
+(neoantigen*[tiab] OR neoepitope*[tiab] OR "T cell recognition"[tiab]
+ OR TCR[tiab] OR "antigen presentation"[tiab] OR "immune evasion"[tiab]
+ OR tumor[tiab] OR cancer[tiab])
+```
+
+**414 matches · 413 saved**
+
+### Query 3 — presentation-focused
+
+Anchored on neoantigens instead, widened across the presentation and
+peptide-evidence vocabulary. This is the query aimed squarely at the review
+question, and it contributed papers the first two missed.
+
+```
+(neoantigen*[tiab] OR neoepitope*[tiab])
+AND
+("antigen presentation"[tiab] OR "antigen processing"[tiab]
+ OR "mass spectrometry"[tiab] OR "HLA ligand*"[tiab]
+ OR "presented peptides"[tiab] OR "HLA presentation"[tiab]
+ OR "MHC presentation"[tiab])
+```
+
+**436 matches · 436 saved**
+
+---
+
+## 2. The funnel
+
+```
+   1,048   papers saved across the three searches
+     │
+     │     −292  duplicate PMIDs (papers found by more than one query)
+     ▼
+     756   unique papers
+     │
+     │       −0  removed by age        (all already 2023+ by the search limit)
+     │     −401  removed by citations  (<50 iCite citations)
+     │            └─ 308 of the survivors were kept only by the
+     │               12-month recency exemption
+     ▼
+     355   papers screened against the research scope
+     │
+     ├──  208   include
+     ├──   63   maybe
+     └──   84   exclude
+```
+
+Settings used: `YEARS_BACK = 5`, `MIN_CITATIONS = 50`,
+`RECENT_MONTHS_EXEMPT = 12`. A journal metric (OpenAlex 2-year mean citedness)
+was found for all 355.
+
+### The 208 included papers
+
+By subtopic:
+
+| Subtopic | Papers |
+|---|---:|
+| Immunopeptidomics | 104 |
+| Neoantigen prediction | 54 |
+| Immunotherapy | 44 |
+| TCR identification | 6 |
+| **Total** | **208** |
+
+By study type:
+
+| Study type | Papers |
+|---|---:|
+| Original research | 84 |
+| Review | 69 |
+| Method / tool | 53 |
+| Clinical | 2 |
+| **Total** | **208** |
+
+That distribution is itself a finding worth noting: TCR identification is thinly
+represented relative to the other subtopics, and only two of the 208 are clinical
+studies. A reviewer should know that before drawing conclusions about clinical
+translation from this set.
+
+---
+
+## 3. From 208 candidates to 51 citations
+
+The review cites 51 of the 208 included papers. The rest were not relevant to
+*this* question — the screening CSV covers a broader scope than any single
+review, which is why the question is supplied separately at the writing stage
+rather than being inferred from the search.
+
+Selection favoured papers answering the question directly, original research and
+method papers over reviews for primary claims, and recent work in
+higher-metric journals where the choice was otherwise even.
+
+See [review-excerpt.md](review-excerpt.md) and
+[references.md](references.md).
+
+---
+
+## A note on what is reproduced here
+
+Paper **titles, PMIDs, journals and years** are bibliographic facts, reproduced
+so the references can be verified. **No abstracts or other text from any paper
+are copied into this repository.** The review prose is the agent's own writing.
+Run outputs (`results/`) are git-ignored; the files are regenerated by running
+the pipeline.
